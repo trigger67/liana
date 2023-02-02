@@ -1,28 +1,26 @@
 use chrono::NaiveDateTime;
 
+use iced::Color;
+use iced::theme::{self, Theme};
+
 use iced::{
     alignment,
     widget::{Button, Column, Container, Row},
     Alignment, Element, Length,
 };
 
-use crate::ui::{
+use liana::miniscript::bitcoin;
+
+use crate::{app::{state::Home, cache::Cache, view::{message::Message, util::*}}, ui::{
     color,
     component::{badge, button::Style, card, text::*},
     icon,
     util::Collection,
-};
-use liana::miniscript::bitcoin;
+}, daemon::model::HistoryTransaction};
 
-use crate::{
-    app::{
-        cache::Cache,
-        view::{message::Message, util::*},
-    },
-    daemon::model::HistoryTransaction,
-};
 
-pub const HISTORY_EVENT_PAGE_SIZE: u64 = 20;
+
+pub const HISTORY_EVENT_PAGE_SIZE: u64 = 5;
 
 pub fn home_view<'a>(
     balance: &'a bitcoin::Amount,
@@ -31,9 +29,15 @@ pub fn home_view<'a>(
     pending_events: &[HistoryTransaction],
     events: &Vec<HistoryTransaction>,
 ) -> Element<'a, Message> {
+    
     Column::new()
-        .push(Column::new().padding(40))
-        .push(amount_with_size(balance, 50))
+        .spacing(2)
+        // Balance
+        .push(text_with_size("Balance", 30))
+        .push(Column::new().padding(10))
+        .push(amount_with_size(balance, 40))
+        .push(text_with_size("~ x,xxx.xx€", 22))
+        // Recovery path warnings
         .push_maybe(recovery_warning.map(|(a, c)| {
             Row::new()
                 .spacing(15)
@@ -67,6 +71,7 @@ pub fn home_view<'a>(
                 )
                 .padding(10)
         }))
+        // History
         .push(
             Column::new()
                 .spacing(10)
@@ -108,8 +113,6 @@ pub fn home_view<'a>(
                     },
                 ),
         )
-        .align_items(Alignment::Center)
-        .spacing(20)
         .into()
 }
 
@@ -156,9 +159,9 @@ fn event_list_view<'a>(i: usize, event: &HistoryTransaction) -> Element<'a, Mess
         )
         .padding(10)
         .on_press(Message::Select(i))
-        .style(Style::TransparentBorder.into()),
+        .style(Style::TransparentBorder.into())
     )
-    .style(card::SimpleCardStyle)
+    //.style(card::SimpleCardStyle)
     .into()
 }
 

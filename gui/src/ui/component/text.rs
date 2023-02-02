@@ -9,6 +9,12 @@ pub fn text<'a>(content: impl Into<Cow<'a, str>>) -> iced::widget::Text<'a> {
         .size(TEXT_REGULAR_SIZE)
 }
 
+pub fn text_with_size<'a>(content: impl Into<Cow<'a, str>>, size: u16) -> iced::widget::Text<'a> {
+    iced::widget::Text::new(content)
+        .font(font::REGULAR)
+        .size(size)
+}
+
 pub trait Text {
     fn bold(self) -> Self;
     fn small(self) -> Self;

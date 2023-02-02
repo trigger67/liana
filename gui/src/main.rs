@@ -2,7 +2,7 @@
 
 use std::{error::Error, path::PathBuf, str::FromStr};
 
-use iced::{executor, Application, Command, Element, Settings, Subscription};
+use iced::{executor, Application, Command, Element, Settings, Subscription, Theme};
 extern crate serde;
 extern crate serde_json;
 
@@ -68,6 +68,7 @@ fn log_level_from_config(config: &app::Config) -> Result<log::LevelFilter, Box<d
 }
 
 pub struct GUI {
+    theme: Theme,
     state: State,
 }
 
@@ -115,6 +116,7 @@ impl Application for GUI {
                 let launcher = Launcher::new(datadir_path);
                 (
                     Self {
+                        theme: Theme::Light,
                         state: State::Launcher(Box::new(launcher)),
                     },
                     Command::perform(ctrl_c(), |_| Message::CtrlC),
@@ -124,6 +126,7 @@ impl Application for GUI {
                 let (install, command) = Installer::new(datadir_path, network);
                 (
                     Self {
+                        theme: Theme::Light,
                         state: State::Installer(Box::new(install)),
                     },
                     Command::batch(vec![
@@ -138,6 +141,7 @@ impl Application for GUI {
                 let (loader, command) = Loader::new(datadir_path, cfg, daemon_cfg);
                 (
                     Self {
+                        theme: Theme::Light,
                         state: State::Loader(Box::new(loader)),
                     },
                     Command::batch(vec![
@@ -248,6 +252,10 @@ impl Application for GUI {
             State::Launcher(v) => v.view().map(|msg| Message::Launch(Box::new(msg))),
             State::Loader(v) => v.view().map(|msg| Message::Load(Box::new(msg))),
         }
+    }
+
+    fn theme(&self) -> Theme {
+        self.theme.clone()
     }
 
     fn scale_factor(&self) -> f64 {
